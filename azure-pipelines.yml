@@ -1,0 +1,40 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  ACR_NAME: 'myacresgitry'
+  IMAGE_TAG: '$(Build.BuildId)'
+
+steps:
+# Build and push Node.js microservice
+- task: Docker@2
+  displayName: Build and Push Node.js Microservice
+  inputs:
+    containerRegistry: '$(ACR_NAME)'
+    repository: 'microservice1'
+    command: 'buildAndPush'
+    Dockerfile: 'microservice1/Dockerfile'
+    tags: '$(IMAGE_TAG)'
+
+# Build and push Flask microservice
+- task: Docker@2
+  displayName: Build and Push Flask Microservice
+  inputs:
+    containerRegistry: '$(ACR_NAME)'
+    repository: 'microservice2'
+    command: 'buildAndPush'
+    Dockerfile: 'microservice2/Dockerfile'
+    tags: '$(IMAGE_TAG)'
+
+# Build and push React frontend
+- task: Docker@2
+  displayName: Build and Push Frontend
+  inputs:
+    containerRegistry: '$(ACR_NAME)'
+    repository: 'frontend'
+    command: 'buildAndPush'
+    Dockerfile: 'frontend/Dockerfile'
+    tags: '$(IMAGE_TAG)'
