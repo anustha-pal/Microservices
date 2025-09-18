@@ -29,12 +29,12 @@ jobs:
 
      
       - name: Build Docker Image
-        run: docker build -t myprojectacrs.azurecr.io/node-images:latest .
+        run: docker build -t myacresgitry.azurecr.io/node-micro:latest .
 
       - name: Log in to ACR
-        run: az acr login --name myprojectacrs
+        run: az acr login --name myacresgitry
 
       - name: Push Docker Image
-        run: docker push myprojectacrs.azurecr.io/node-images:latest
+        run: docker myacresgitry.azurecr.io/node-micro:latest
 
     
