@@ -7,7 +7,7 @@ variables:
   ACR_LOGIN: 'myacresgitry.azurecr.io' 
   IMAGE_TAG: '$(Build.BuildId)'        
   RESOURCE_GROUP: 'MicroservicesRG' 
-  ENV_NAME: 'MicroservicesEnv      
+  ENV_NAME: 'MicroservicesEnv'      
 
 stages:
 - stage: Deploy
