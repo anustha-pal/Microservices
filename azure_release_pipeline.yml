@@ -1,13 +1,13 @@
-trigger: none   
+trigger: none   # No auto trigger, deployment happens after build
+
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  ACR_NAME: 'myacresgitry'             
-  ACR_LOGIN: 'myacresgitry.azurecr.io' 
-  IMAGE_TAG: '$(Build.BuildId)'        
-  RESOURCE_GROUP: 'MicroservicesRG' 
-      
+  ACR_NAME: 'myacresgitry'             # Your ACR name
+  ACR_LOGIN: 'myacresgitry.azurecr.io' # Your ACR login server
+  IMAGE_TAG: '$(Build.BuildId)'        # Must match build pipeline tag
+  RESOURCE_GROUP: 'my-resource-group'  # Resource group of your container apps
 
 stages:
 - stage: Deploy
@@ -16,21 +16,35 @@ stages:
     - job: DeployJob
       displayName: "Deploy Containers"
       steps:
-        #  Deploy Node.js microservice
+        # 🔎 Debug step: print values & show Azure account
+        - task: AzureCLI@2
+          displayName: "Debug: Print variables and account info"
+          inputs:
+            azureSubscription: 'microservices-wif-conn'
+            scriptType: bash
+            scriptLocation: inlineScript
+            inlineScript: |
+              echo "=== Debug Info ==="
+              az account show
+              echo "RESOURCE_GROUP = $(RESOURCE_GROUP)"
+              echo "ACR_LOGIN = $(ACR_LOGIN)"
+              echo "IMAGE_TAG = $(IMAGE_TAG)"
+              echo "=================="
+
+        # ✅ Deploy Node.js microservice
         - task: AzureCLI@2
           displayName: Deploy Node.js Microservice
           inputs:
-            azureSubscription: 'microservices-wif-conn'   
+            azureSubscription: 'microservices-wif-conn'
             scriptType: bash
             scriptLocation: inlineScript
             inlineScript: |
               az containerapp update \
                 --name microservice1 \
                 --resource-group $(RESOURCE_GROUP) \
-                --image $(ACR_LOGIN)/microservice1:$(IMAGE_TAG) \
-                
+                --image $(ACR_LOGIN)/microservice1:$(IMAGE_TAG)
 
-        # Deploy Flask microservice
+        # ✅ Deploy Flask microservice
         - task: AzureCLI@2
           displayName: Deploy Flask Microservice
           inputs:
@@ -41,8 +55,7 @@ stages:
               az containerapp update \
                 --name microservice2 \
                 --resource-group $(RESOURCE_GROUP) \
-                --image $(ACR_LOGIN)/microservice2:$(IMAGE_TAG) \
-                
+                --image $(ACR_LOGIN)/microservice2:$(IMAGE_TAG)
 
         #  Deploy React frontend
         - task: AzureCLI@2
@@ -55,5 +68,4 @@ stages:
               az containerapp update \
                 --name frontend \
                 --resource-group $(RESOURCE_GROUP) \
-                --image $(ACR_LOGIN)/frontend:$(IMAGE_TAG) \
-                
+                --image $(ACR_LOGIN)/frontend:$(IMAGE_TAG)
