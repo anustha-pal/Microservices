@@ -7,7 +7,7 @@ variables:
   ACR_NAME: 'myacresgitry'             # Your ACR name
   ACR_LOGIN: 'myacresgitry.azurecr.io' # Your ACR login server
   IMAGE_TAG: '$(Build.BuildId)'        # Must match build pipeline tag
-  RESOURCE_GROUP: 'my-resource-group'  # Resource group of your container apps
+  RESOURCE_GROUP: 'MicroservicesRG'  # Resource group of your container apps
 
 stages:
 - stage: Deploy
