@@ -28,7 +28,7 @@ stages:
               az account show
               echo "RESOURCE_GROUP = $(RESOURCE_GROUP)"
               echo "ACR_LOGIN = $(ACR_LOGIN)"
-              echo "IMAGE_TAG = $(Build.BuildId)"
+              echo "IMAGE_TAG = $(IMAGE_TAG)"
 
               
 
@@ -43,7 +43,7 @@ stages:
               az containerapp update \
                 --name microservice1 \
                 --resource-group $(RESOURCE_GROUP) \
-                --image $(ACR_LOGIN)/microservice1:$(Build.BuildId)
+                --image $(ACR_LOGIN)/microservice1:$(IMAGE_TAG)
 
 
         
@@ -57,7 +57,7 @@ stages:
               az containerapp update \
                 --name microservice2 \
                 --resource-group $(RESOURCE_GROUP) \
-                --image $(ACR_LOGIN)/microservice2:$(Build.BuildId)
+                --image $(ACR_LOGIN)/microservice2:$(IMAGE_TAG)
 
 
         
@@ -71,5 +71,5 @@ stages:
               az containerapp update \
                 --name frontend \
                 --resource-group $(RESOURCE_GROUP) \
-                --image $(ACR_LOGIN)/frontend:$(Build.BuildId)
+                --image $(ACR_LOGIN)/frontend:$(IMAGE_TAG)
 
