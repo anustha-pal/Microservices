@@ -4,10 +4,10 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  ACR_NAME: 'myacresgitry'             # Your ACR name
-  ACR_LOGIN: 'myacresgitry.azurecr.io' # Your ACR login server
-  IMAGE_TAG: '$(Build.BuildId)'        # Must match build pipeline tag
-  RESOURCE_GROUP: 'MicroservicesRG'  # Resource group of your container apps
+  ACR_NAME: 'myacresgitry'             
+  ACR_LOGIN: 'myacresgitry.azurecr.io' 
+  IMAGE_TAG: '$(Build.BuildId)'        
+  RESOURCE_GROUP: 'MicroservicesRG'  
 
 stages:
 - stage: Deploy
@@ -16,7 +16,7 @@ stages:
     - job: DeployJob
       displayName: "Deploy Containers"
       steps:
-        # 🔎 Debug step: print values & show Azure account
+        # Debug and print values & show Azure account
         - task: AzureCLI@2
           displayName: "Debug: Print variables and account info"
           inputs:
@@ -28,10 +28,11 @@ stages:
               az account show
               echo "RESOURCE_GROUP = $(RESOURCE_GROUP)"
               echo "ACR_LOGIN = $(ACR_LOGIN)"
-              echo "IMAGE_TAG = $(IMAGE_TAG)"
-              echo "=================="
+              echo "IMAGE_TAG = $(Build.BuildId)"
 
-        # ✅ Deploy Node.js microservice
+              
+
+        
         - task: AzureCLI@2
           displayName: Deploy Node.js Microservice
           inputs:
@@ -42,9 +43,10 @@ stages:
               az containerapp update \
                 --name microservice1 \
                 --resource-group $(RESOURCE_GROUP) \
-                --image $(ACR_LOGIN)/microservice1:$(IMAGE_TAG)
+                --image $(ACR_LOGIN)/microservice1:$(Build.BuildId)
 
-        # ✅ Deploy Flask microservice
+
+        
         - task: AzureCLI@2
           displayName: Deploy Flask Microservice
           inputs:
@@ -55,9 +57,10 @@ stages:
               az containerapp update \
                 --name microservice2 \
                 --resource-group $(RESOURCE_GROUP) \
-                --image $(ACR_LOGIN)/microservice2:$(IMAGE_TAG)
+                --image $(ACR_LOGIN)/microservice2:$(Build.BuildId)
 
-        #  Deploy React frontend
+
+        
         - task: AzureCLI@2
           displayName: Deploy React Frontend
           inputs:
@@ -68,4 +71,5 @@ stages:
               az containerapp update \
                 --name frontend \
                 --resource-group $(RESOURCE_GROUP) \
-                --image $(ACR_LOGIN)/frontend:$(IMAGE_TAG)
+                --image $(ACR_LOGIN)/frontend:$(Build.BuildId)
+
