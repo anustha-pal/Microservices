@@ -1,39 +1,76 @@
-trigger:
-- main
+trigger: none   # No auto trigger, deployment happens after build
 
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  ACR_SERVICE_CONN: 'microservices-acr-conn'  
-  IMAGE_TAG: '$(Build.BuildId)'               
+  ACR_NAME: 'myacresgitry'             
+  ACR_LOGIN: 'myacresgitry.azurecr.io' 
+  IMAGE_TAG: '$(Build.BuildId)'        
+  RESOURCE_GROUP: 'MicroservicesRG'  
 
-steps:
+stages:
+- stage: Deploy
+  displayName: "Deploy Microservices to Container Apps"
+  jobs:
+    - job: DeployJob
+      displayName: "Deploy Containers"
+      steps:
+        # Debug and print values & show Azure account
+        - task: AzureCLI@2
+          displayName: "Debug: Print variables and account info"
+          inputs:
+            azureSubscription: 'microservices-wif-conn'
+            scriptType: bash
+            scriptLocation: inlineScript
+            inlineScript: |
+              echo "=== Debug Info ==="
+              az account show
+              echo "RESOURCE_GROUP = $(RESOURCE_GROUP)"
+              echo "ACR_LOGIN = $(ACR_LOGIN)"
+              echo "IMAGE_TAG = $(IMAGE_TAG)"
 
-- task: Docker@2
-  displayName: Build & Push Node.js Microservice
-  inputs:
-    containerRegistry: '$(ACR_SERVICE_CONN)'
-    repository: 'microservice1'
-    command: 'buildAndPush'
-    Dockerfile: 'microservice1/Dockerfile'
-    tags: '$(IMAGE_TAG)'
+              
+
+        
+        - task: AzureCLI@2
+          displayName: Deploy Node.js Microservice
+          inputs:
+            azureSubscription: 'microservices-wif-conn'
+            scriptType: bash
+            scriptLocation: inlineScript
+            inlineScript: |
+              az containerapp update \
+                --name microservice1 \
+                --resource-group $(RESOURCE_GROUP) \
+                --image $(ACR_LOGIN)/microservice1:$(IMAGE_TAG)
 
 
-- task: Docker@2
-  displayName: Build & Push Flask Microservice
-  inputs:
-    containerRegistry: '$(ACR_SERVICE_CONN)'
-    repository: 'microservice2'
-    command: 'buildAndPush'
-    Dockerfile: 'microservice2/Dockerfile'
-    tags: '$(IMAGE_TAG)'
+        
+        - task: AzureCLI@2
+          displayName: Deploy Flask Microservice
+          inputs:
+            azureSubscription: 'microservices-wif-conn'
+            scriptType: bash
+            scriptLocation: inlineScript
+            inlineScript: |
+              az containerapp update \
+                --name microservice2 \
+                --resource-group $(RESOURCE_GROUP) \
+                --image $(ACR_LOGIN)/microservice2:$(IMAGE_TAG)
 
-- task: Docker@2
-  displayName: Build & Push React Frontend
-  inputs:
-    containerRegistry: '$(ACR_SERVICE_CONN)'
-    repository: 'frontend'
-    command: 'buildAndPush'
-    Dockerfile: 'frontend/Dockerfile'
-    tags: '$(IMAGE_TAG)'
+
+        
+        - task: AzureCLI@2
+          displayName: Deploy React Frontend
+          inputs:
+            azureSubscription: 'microservices-wif-conn'
+            scriptType: bash
+            scriptLocation: inlineScript
+            inlineScript: |
+              az containerapp update \
+                --name frontend \
+                --resource-group $(RESOURCE_GROUP) \
+                --image $(ACR_LOGIN)/frontend:$(IMAGE_TAG)
+
+'
